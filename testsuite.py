@@ -21,6 +21,14 @@ def check_recode ():
     return 0
 
 
+def expected_result (obtained, valid):
+    if obtained == valid:
+        return True
+    try:
+        return eval(obtained) == eval(valid)
+    except SyntaxError:
+        return False
+
 
 def check_bibtex ():
 
@@ -65,7 +73,7 @@ def check_bibtex ():
 
             valid = result.readline ().strip ()
             
-            if obtained != valid:
+            if not expected_result(obtained, valid):
                 sys.stderr.write ('error: %s: line %d: unexpected result:\n' % (
                     filename, line))
                 sys.stderr.write ('error: %s: line %d:    obtained %s\n' % (
@@ -117,7 +125,7 @@ def check_bibtex ():
 
             valid = result.readline ().strip ()
             
-            if obtained != valid:
+            if not expected_result(obtained, valid):
                 sys.stderr.write ('error: %s: line %d: unexpected result:\n' % (
                     filename, line))
                 sys.stderr.write ('error: %s: line %d:    obtained %s\n' % (
