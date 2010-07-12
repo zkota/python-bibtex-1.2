@@ -1,5 +1,9 @@
 -*- charset: utf-8 -*-
 
+Version 1.2.5 (2010-07-12)
+
+  * fixed testsuite
+
 Version 1.2.4 (2007-04-23)
 
   * fixed bug in escaping non title fields
