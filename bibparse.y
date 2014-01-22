@@ -103,14 +103,14 @@ bibtex_analyzer_parse (BibtexSource * source) {
   is_comment = (entry->type && (strcasecmp (entry->type, "comment") == 0));
 
   if (warning_string && ! is_comment) {
-      bibtex_warning (warning_string);
+      bibtex_warning ("%s", warning_string);
   }
   
   if (ret != 0) {
       source->line += entry->length;
       
       if (error_string && ! is_comment) {
-	  bibtex_error (error_string);
+	  bibtex_error ("%s", error_string);
       }
 
       bibtex_entry_destroy (entry, TRUE);
