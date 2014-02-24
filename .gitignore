@@ -1,3 +1,6 @@
-.arch-ids/
-.arch-inventory
-\{arch\}/
+biblex.c
+bibparse.c
+bibparse.h
+build
+*~
+*.pyc
