@@ -345,16 +345,16 @@ bibtex_real_string (BibtexStruct * s,
 	    type == BIBTEX_TITLE) {
 	    if (at_beginning) {
 		text [0] = toupper (text [0]);
-		g_strdown (text + 1);
+		g_ascii_strdown (text + 1, -1);
 	    }
 	    else {
-		g_strdown (text);
+		g_ascii_strdown (text, -1);
 	    }
 	}
 	break;
 
     case BIBTEX_STRUCT_REF:
-	g_strdown (s->value.ref);
+	g_ascii_strdown (s->value.ref, -1);
 
 	if (as_bibtex && ! as_latex) {
 	    text = g_strdup (s->value.ref);

@@ -375,7 +375,7 @@ extract_author (BibtexAuthorGroup * authors,
 
 	    lastname_section = sections;
 
-	    g_strdown (text);
+	    g_ascii_strdown (text, -1);
 	    g_ptr_array_add (array, text);
 	    continue;
 	}
@@ -614,7 +614,7 @@ bibtex_author_parse (BibtexStruct * s,
 
 	list = list->next;
 
-	if (g_strcasecmp (text, "and") == 0) {
+	if (g_ascii_strcasecmp (text, "and") == 0) {
 	    if (aut_elem == NULL) {
 		bibtex_warning ("double `and' in author field");
 	    }

@@ -109,7 +109,7 @@ bibtex_source_set_string (BibtexSource * source,
 
     if ((oldstruct = g_hash_table_lookup (source->table, inskey)) == NULL) {
 	inskey = g_strdup (key);
-	g_strdown (inskey);
+	g_ascii_strdown (inskey, -1);
     }
     else {
 	bibtex_struct_destroy (oldstruct, TRUE);
