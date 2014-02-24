@@ -119,21 +119,11 @@ typedef struct {
     guint level;
 } BTGroup;
 
-static GMemChunk * chunk = NULL;
-
 static BTGroup * 
 btgroup_new (gchar * text,
 	     guint level) {
-    BTGroup * group;
+    BTGroup * group = g_new (BTGroup, 1);
 
-    if (chunk == NULL) {
-	chunk = g_mem_chunk_new ("BTGroup",
-				 sizeof (BTGroup),
-				 sizeof (BTGroup) * 16,
-				 G_ALLOC_AND_FREE);
-    }
-
-    group = g_chunk_new (BTGroup, chunk);
     group->text = text;
     group->level = level;
 
@@ -142,8 +132,7 @@ btgroup_new (gchar * text,
 
 static void
 btgroup_destroy (BTGroup * group) {
-
-    g_chunk_free (group, chunk);
+    g_free (group);
 }
 
 /* this function adds the comma separated blocks to the token list */

@@ -30,20 +30,9 @@
 
 #include "bibtex.h"
 
-static GMemChunk * struct_chunk = NULL;
-
 BibtexStruct *
 bibtex_struct_new (BibtexStructType type) {
-    BibtexStruct * s;
-    
-    if (struct_chunk == NULL) {
-	struct_chunk = g_mem_chunk_new ("BibtexStruct",
-					sizeof (BibtexStruct),
-					sizeof (BibtexStruct) * 16,
-					G_ALLOC_AND_FREE);
-    }
-
-    s = g_chunk_new (BibtexStruct, struct_chunk);
+    BibtexStruct * s = g_new (BibtexStruct, 1);
 
     s->type = type;
 
@@ -127,7 +116,7 @@ bibtex_struct_destroy (BibtexStruct * s,
 	break;
     }
 
-    g_chunk_free (s, struct_chunk);
+    g_free (s);
 }
 
 /* -------------------------------------------------- */
