@@ -341,7 +341,7 @@ bibtex_capitalize (gchar * text,
     /* Put everything lowercase */
     if (is_noun) {
 	gchar* c = text;
-	for (; *c != '\0'; *(c++) = g_ascii_tolower(*c));
+	for (; *c != '\0'; *c = g_ascii_tolower(*c), c++);
     }
 
     current = text;
