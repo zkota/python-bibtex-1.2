@@ -508,15 +508,16 @@ _bib_next (PyBibtexSource_Object * file_obj, gboolean filter)
 	}
 	else {
 	    name = Py_None;
+	    Py_INCREF(name);
 	}
 	
 	if (filter) {
-	    tmp = Py_BuildValue ("OsiiO", name, ent->type, 
+	    tmp = Py_BuildValue ("NsiiO", name, ent->type, 
 				 ent->offset, ent->start_line,
 				 dico);
 	}
 	else {
-	    tmp = Py_BuildValue ("(s(OsiiO))", "entry", name, 
+	    tmp = Py_BuildValue ("(s(NsiiO))", "entry", name, 
 				 ent->type, 
 				 ent->offset, ent->start_line,
 				 dico);
@@ -693,6 +694,8 @@ bib_reverse (PyObject * self, PyObject * args)
 		auth->honorific = NULL;
 	    }
 	    Py_DECREF (tmp);
+
+	    Py_DECREF(authobj);
 	}
     }
 
