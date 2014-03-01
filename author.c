@@ -364,7 +364,9 @@ extract_author (BibtexAuthorGroup * authors,
 
 	    lastname_section = sections;
 
-	    g_ascii_strdown (text, -1);
+	    gchar *c = text;
+	    for (; *c != '\0'; *(c++) = g_ascii_tolower(*c));
+
 	    g_ptr_array_add (array, text);
 	    continue;
 	}

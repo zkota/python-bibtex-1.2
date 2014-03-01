@@ -327,34 +327,31 @@ bibtex_real_string (BibtexStruct * s,
 	break;
 	
     case BIBTEX_STRUCT_TEXT:
-	text = g_strdup (s->value.text);
 
 	if ((! as_bibtex || as_latex) && 
 	    level == 1 && 
 	    type == BIBTEX_TITLE) {
+	    text = g_ascii_strdown(s->value.text, -1);
 	    if (at_beginning) {
-		text [0] = toupper (text [0]);
-		g_ascii_strdown (text + 1, -1);
+		text [0] = toupper(text[0]);
 	    }
-	    else {
-		g_ascii_strdown (text, -1);
-	    }
+	} else {
+  	    text = g_strdup(s->value.text);
 	}
 	break;
 
     case BIBTEX_STRUCT_REF:
-	g_ascii_strdown (s->value.ref, -1);
-
 	if (as_bibtex && ! as_latex) {
-	    text = g_strdup (s->value.ref);
+	    text = g_ascii_strdown(s->value.ref, -1);
 	}
 	else {
 	    if (loss) * loss = TRUE;
 
 	    if (dico) {
-		tmp_s = (BibtexStruct *) 
-		    g_hash_table_lookup (dico, s->value.ref);
-		
+	        tmp = g_ascii_strdown(s->value.ref, -1);
+		tmp_s = (BibtexStruct *) g_hash_table_lookup(dico, tmp);
+		g_free(tmp);
+
 		if (tmp_s) {
 		    text = bibtex_real_string (tmp_s, type, 
 					       dico, 

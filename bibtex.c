@@ -84,7 +84,9 @@ add_to_dico (gpointer key, gpointer value, gpointer user) {
     }
 
     field = (BibtexField *) value;
-    g_ascii_strdown (val, -1);
+
+    gchar* c = val;
+    for (; *c != '\0'; *(c++) = g_ascii_tolower(*c));
 
     g_hash_table_insert ((GHashTable *) user, val, field->structure);
 }
