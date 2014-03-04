@@ -119,21 +119,11 @@ typedef struct {
     guint level;
 } BTGroup;
 
-static GMemChunk * chunk = NULL;
-
 static BTGroup * 
 btgroup_new (gchar * text,
 	     guint level) {
-    BTGroup * group;
+    BTGroup * group = g_new (BTGroup, 1);
 
-    if (chunk == NULL) {
-	chunk = g_mem_chunk_new ("BTGroup",
-				 sizeof (BTGroup),
-				 sizeof (BTGroup) * 16,
-				 G_ALLOC_AND_FREE);
-    }
-
-    group = g_chunk_new (BTGroup, chunk);
     group->text = text;
     group->level = level;
 
@@ -142,8 +132,7 @@ btgroup_new (gchar * text,
 
 static void
 btgroup_destroy (BTGroup * group) {
-
-    g_chunk_free (group, chunk);
+    g_free (group);
 }
 
 /* this function adds the comma separated blocks to the token list */
@@ -153,14 +142,11 @@ split_spaces (GList * tokens,
 	      gchar * data,
 	      guint level) {
     gchar * text, * courant, sep;
-    gboolean one = TRUE;
     
     text = data;
     courant = data;
 
     while ((text = strchr (text, ',')) != NULL) {
-	one = FALSE;
-
 	sep  = * text;
 	* text = '\0';
 
@@ -375,7 +361,9 @@ extract_author (BibtexAuthorGroup * authors,
 
 	    lastname_section = sections;
 
-	    g_strdown (text);
+	    gchar *c = text;
+	    for (; *c != '\0'; *c = g_ascii_tolower(*c), c++);
+
 	    g_ptr_array_add (array, text);
 	    continue;
 	}
@@ -494,7 +482,7 @@ bibtex_author_parse (BibtexStruct * s,
     gboolean skip;
     GList * target;
     BTGroup * group, * tmp_g;
-    gboolean compact, first_pass;
+    gboolean compact;
 
 
     g_return_val_if_fail (s != NULL, NULL);
@@ -518,7 +506,6 @@ bibtex_author_parse (BibtexStruct * s,
        Compact the strings as much as possible 
        -------------------------------------------------- */
     compact    = FALSE;
-    first_pass = TRUE;
 
     while (! compact) {
 	compact = TRUE;
@@ -598,7 +585,6 @@ bibtex_author_parse (BibtexStruct * s,
 	g_list_free (toremove);
 
 	/* ...and eventually start again */
-	first_pass = FALSE;
     }
 
     /* --------------------------------------------------
@@ -614,7 +600,7 @@ bibtex_author_parse (BibtexStruct * s,
 
 	list = list->next;
 
-	if (g_strcasecmp (text, "and") == 0) {
+	if (g_ascii_strcasecmp (text, "and") == 0) {
 	    if (aut_elem == NULL) {
 		bibtex_warning ("double `and' in author field");
 	    }

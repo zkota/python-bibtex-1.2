@@ -41,7 +41,7 @@ void bibtex_message_handler (const gchar *log_domain G_GNUC_UNUSED,
 	fprintf (stderr, "%s: ", name);
     }
 
-    switch (log_level) {
+    switch ((int)log_level) {
 
     case BIB_LEVEL_ERROR:
 	fprintf (stderr, "error: %s\n", message);
@@ -84,7 +84,9 @@ add_to_dico (gpointer key, gpointer value, gpointer user) {
     }
 
     field = (BibtexField *) value;
-    g_strdown (val);
+
+    gchar* c = val;
+    for (; *c != '\0'; *c = g_ascii_tolower(*c), c++);
 
     g_hash_table_insert ((GHashTable *) user, val, field->structure);
 }

@@ -1,4 +1,4 @@
-# -* coding: latin-1 -*-
+# -*- coding: latin-1 -*-
 """ Run is the main function that will check if the recode and bibtex
 modules are working """
 
@@ -40,13 +40,12 @@ def check_bibtex ():
     def checkfile (filename, strict = 1, typemap = {}):
         
         def expand (file, entry, type = -1):
-
-            items = entry [4]
-    
-            for k in items.keys ():
-                items [k] = _bibtex.expand (file, items [k], typemap.get (k, -1))
-
-            return
+            """Inline the expanded respresentation of each field."""
+            bibkey, bibtype, a, b, items = entry
+            results = []
+            for k in sorted(items):
+                results.append((k, _bibtex.expand (file, items [k], typemap.get (k, -1))))
+            return (bibkey, bibtype, a, b, results)
         
         file   = _bibtex.open_file (filename, strict)
         result = open (filename + '-ok', 'r')
@@ -62,8 +61,7 @@ def check_bibtex ():
 
                 if entry is None: break
                             
-                expand (file, entry)
-                obtained = `entry`
+                obtained = `expand (file, entry)`
                 
             except IOError, msg:
                 obtained = 'ParserError'
@@ -90,15 +88,14 @@ def check_bibtex ():
     def checkunfiltered (filename, strict = 1):
         
         def expand (file, entry):
+            if entry[0] in ('preamble', 'string'):
+                return entry
 
-            if entry [0] in ('preamble', 'string'): return
-            
-            items = entry [1] [4]
-    
-            for k in items.keys ():
-                items [k] = _bibtex.expand (file, items [k], -1)
+            bibkind, (bibkey, bibtype, a, b, items) = entry
 
-            return
+            results = [(k, _bibtex.expand (file, items [k], -1))
+                       for k in sorted(items)]
+            return (bibkind, (bibkey, bibtype, a, b, results))
         
         file   = _bibtex.open_file (filename, strict)
         result = open (filename + '-ok', 'r')
@@ -114,8 +111,7 @@ def check_bibtex ():
 
                 if entry is None: break
 
-                expand (file, entry)
-                obtained = `entry`
+                obtained = `expand (file, entry)`
                 
             except IOError, msg:
                 obtained = 'ParserError'

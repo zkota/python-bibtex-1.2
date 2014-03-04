@@ -29,20 +29,9 @@
 #include "bibtex.h"
 
 
-static GMemChunk * field_chunk = NULL;
-
 BibtexField *
 bibtex_field_new (BibtexFieldType type) {
-    BibtexField * field;
-
-    if (field_chunk == NULL) {
-	field_chunk = g_mem_chunk_new ("BibtexField",
-				       sizeof (BibtexField),
-				       sizeof (BibtexField) * 16,
-				       G_ALLOC_AND_FREE);
-    }
-
-    field = g_chunk_new (BibtexField, field_chunk);
+    BibtexField * field = g_new (BibtexField, 1);
     
     field->structure = NULL;
     field->type = type;
@@ -103,7 +92,7 @@ bibtex_field_destroy (BibtexField * field,
       break;
     }
 
-    g_chunk_free (field, field_chunk);
+    g_free (field);
 }
 
 

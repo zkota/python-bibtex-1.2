@@ -27,8 +27,6 @@
 
 #include "bibtex.h"
 
-static GMemChunk * entry_chunk = NULL;
-
 static void
 free_data_field (gpointer key, 
 		 gpointer value, 
@@ -43,16 +41,7 @@ free_data_field (gpointer key,
 
 BibtexEntry *
 bibtex_entry_new (void) {
-    BibtexEntry * entry;
-
-    if (entry_chunk == NULL) {
-	entry_chunk = g_mem_chunk_new ("BibtexEntry",
-				       sizeof (BibtexEntry),
-				       sizeof (BibtexEntry) * 16,
-				       G_ALLOC_AND_FREE);
-    }
-
-    entry = g_chunk_new (BibtexEntry, entry_chunk);
+    BibtexEntry * entry = g_new (BibtexEntry, 1);
     
     entry->length = 0;
 
@@ -85,5 +74,5 @@ bibtex_entry_destroy (BibtexEntry * entry,
     g_hash_table_foreach (entry->table, free_data_field, GINT_TO_POINTER(content));
     g_hash_table_destroy (entry->table);
 
-    g_chunk_free (entry, entry_chunk);
+    g_free (entry);
 }

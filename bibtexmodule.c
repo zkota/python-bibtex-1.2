@@ -139,8 +139,9 @@ bib_open_file (PyObject * self, PyObject * args)
     /* Create a new object */
     ret = (PyBibtexSource_Object *) 
 	PyObject_NEW (PyBibtexSource_Object, & PyBibtexSource_Type);
-    ret->obj = file;
+    if (ret == NULL) return NULL;
 
+    ret->obj = file;
     return (PyObject *) ret;
 }
 
@@ -169,8 +170,9 @@ bib_open_string (PyObject * self, PyObject * args)
     /* Create a new object */
     ret = (PyBibtexSource_Object *) 
 	PyObject_NEW (PyBibtexSource_Object, & PyBibtexSource_Type);
-    ret->obj = file;
+    if (ret == NULL) return NULL;
 
+    ret->obj = file;
     return (PyObject *) ret;
 }
 
@@ -319,10 +321,11 @@ bib_copy_field (PyObject * self, PyObject * args) {
 
     field = field_obj->obj;
 
-    new_obj = (PyBibtexField_Object *) PyObject_NEW (PyBibtexField_Object, & PyBibtexField_Type);
+    new_obj = (PyBibtexField_Object *) 
+	PyObject_NEW(PyBibtexField_Object, & PyBibtexField_Type);
+    if (new_obj == NULL) return NULL;
 
     new_obj->obj = bibtex_struct_as_field (bibtex_struct_copy (field->structure), field->type);
-
     return (PyObject *) new_obj;
 }
 
@@ -394,8 +397,9 @@ bib_set_native (PyObject * self, PyObject * args) {
     field = bibtex_struct_as_field (s, type);
 
     tmp = (PyObject *) PyObject_NEW (PyBibtexField_Object, & PyBibtexField_Type);
-    ((PyBibtexField_Object *) tmp)->obj = field;
+    if (tmp == NULL) return NULL;
 
+    ((PyBibtexField_Object *) tmp)->obj = field;
     return tmp;
 }
 
@@ -407,8 +411,10 @@ fill_dico (gpointer key, gpointer value, gpointer user)
     PyObject * tmp1, * tmp2;
 
     tmp1 = PyString_FromString ((char *) key);
-
     tmp2 = (PyObject *) PyObject_NEW (PyBibtexField_Object, & PyBibtexField_Type);
+    /* this only happens when OOM'ing, not much to salvage except not crashing */
+    if (tmp1 == NULL || tmp2 == NULL) return;
+    
     ((PyBibtexField_Object *) tmp2)->obj = value;
 
     PyDict_SetItem (dico, tmp1, tmp2);
@@ -424,8 +430,9 @@ fill_struct_dico (gpointer key, gpointer value, gpointer user)
     PyObject * tmp1, * tmp2;
 
     tmp1 = PyString_FromString ((char *) key);
-
     tmp2 = (PyObject *) PyObject_NEW (PyBibtexField_Object, & PyBibtexField_Type);
+    /* this only happens when OOM'ing, not much to salvage except not crashing */
+    if (tmp1 == NULL || tmp2 == NULL) return;
 
     ((PyBibtexField_Object *) tmp2)->obj = bibtex_struct_as_field
 	(bibtex_struct_copy ((BibtexStruct *) value), BIBTEX_OTHER);
@@ -508,15 +515,16 @@ _bib_next (PyBibtexSource_Object * file_obj, gboolean filter)
 	}
 	else {
 	    name = Py_None;
+	    Py_INCREF(name);
 	}
 	
 	if (filter) {
-	    tmp = Py_BuildValue ("OsiiO", name, ent->type, 
+	    tmp = Py_BuildValue ("NsiiO", name, ent->type, 
 				 ent->offset, ent->start_line,
 				 dico);
 	}
 	else {
-	    tmp = Py_BuildValue ("(s(OsiiO))", "entry", name, 
+	    tmp = Py_BuildValue ("(s(NsiiO))", "entry", name, 
 				 ent->type, 
 				 ent->offset, ent->start_line,
 				 dico);
@@ -693,12 +701,16 @@ bib_reverse (PyObject * self, PyObject * args)
 		auth->honorific = NULL;
 	    }
 	    Py_DECREF (tmp);
+
+	    Py_DECREF(authobj);
 	}
     }
 
     bibtex_reverse_field (field, brace, quote);
 
     tmp = (PyObject *) PyObject_NEW (PyBibtexField_Object, & PyBibtexField_Type);
+    if (tmp == NULL) return NULL;
+
     ((PyBibtexField_Object *) tmp)->obj = field;
     return tmp;
 }

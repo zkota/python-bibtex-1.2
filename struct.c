@@ -30,20 +30,9 @@
 
 #include "bibtex.h"
 
-static GMemChunk * struct_chunk = NULL;
-
 BibtexStruct *
 bibtex_struct_new (BibtexStructType type) {
-    BibtexStruct * s;
-    
-    if (struct_chunk == NULL) {
-	struct_chunk = g_mem_chunk_new ("BibtexStruct",
-					sizeof (BibtexStruct),
-					sizeof (BibtexStruct) * 16,
-					G_ALLOC_AND_FREE);
-    }
-
-    s = g_chunk_new (BibtexStruct, struct_chunk);
+    BibtexStruct * s = g_new (BibtexStruct, 1);
 
     s->type = type;
 
@@ -127,7 +116,7 @@ bibtex_struct_destroy (BibtexStruct * s,
 	break;
     }
 
-    g_chunk_free (s, struct_chunk);
+    g_free (s);
 }
 
 /* -------------------------------------------------- */
@@ -338,34 +327,31 @@ bibtex_real_string (BibtexStruct * s,
 	break;
 	
     case BIBTEX_STRUCT_TEXT:
-	text = g_strdup (s->value.text);
 
 	if ((! as_bibtex || as_latex) && 
 	    level == 1 && 
 	    type == BIBTEX_TITLE) {
+	    text = g_ascii_strdown(s->value.text, -1);
 	    if (at_beginning) {
-		text [0] = toupper (text [0]);
-		g_strdown (text + 1);
+		text [0] = toupper(text[0]);
 	    }
-	    else {
-		g_strdown (text);
-	    }
+	} else {
+  	    text = g_strdup(s->value.text);
 	}
 	break;
 
     case BIBTEX_STRUCT_REF:
-	g_strdown (s->value.ref);
-
 	if (as_bibtex && ! as_latex) {
-	    text = g_strdup (s->value.ref);
+	    text = g_ascii_strdown(s->value.ref, -1);
 	}
 	else {
 	    if (loss) * loss = TRUE;
 
 	    if (dico) {
-		tmp_s = (BibtexStruct *) 
-		    g_hash_table_lookup (dico, s->value.ref);
-		
+	        tmp = g_ascii_strdown(s->value.ref, -1);
+		tmp_s = (BibtexStruct *) g_hash_table_lookup(dico, tmp);
+		g_free(tmp);
+
 		if (tmp_s) {
 		    text = bibtex_real_string (tmp_s, type, 
 					       dico, 

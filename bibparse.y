@@ -222,8 +222,7 @@ bibtex_parser_start_warning (char * s) {
 entry:	  '@' L_NAME '{' values '}' 
 /* -------------------------------------------------- */
 {
-    entry->type = g_strdup ($2);
-    g_strdown (entry->type);
+    entry->type = g_ascii_strdown($2, -1);
 
     YYACCEPT; 
 }
@@ -231,8 +230,7 @@ entry:	  '@' L_NAME '{' values '}'
         | '@' L_NAME '(' values ')' 
 /* -------------------------------------------------- */
 { 
-    entry->type = g_strdup ($2);
-    g_strdown (entry->type);
+    entry->type = g_ascii_strdown($2, -1);
 
     YYACCEPT; 	
 }
@@ -248,8 +246,7 @@ entry:	  '@' L_NAME '{' values '}'
 /* -------------------------------------------------- */
 {
     if (strcasecmp ($2, "comment") == 0) {
-	entry->type = g_strdup ($2);
-	g_strdown (entry->type);
+	entry->type = g_ascii_strdown($2, -1);
 
 	yyclearin;
 	YYACCEPT;
@@ -262,8 +259,7 @@ entry:	  '@' L_NAME '{' values '}'
     else {
 	bibtex_parser_start_warning ("perhaps a missing coma.");
 
-	entry->type = g_strdup ($2);
-	g_strdown (entry->type);
+	entry->type = g_ascii_strdown($2, -1);
 
 	yyclearin;
 	YYACCEPT;
@@ -274,8 +270,7 @@ entry:	  '@' L_NAME '{' values '}'
 /* -------------------------------------------------- */
 {
     if (strcasecmp ($2, "comment") == 0) {
-	entry->type = g_strdup ($2);
-	g_strdown (entry->type);
+	entry->type = g_ascii_strdown($2, -1);
 
 	yyclearin;
 	YYACCEPT;
@@ -288,8 +283,7 @@ entry:	  '@' L_NAME '{' values '}'
     else {
 	bibtex_parser_start_warning ("perhaps a missing coma");
 
-	entry->type = g_strdup ($2);
-	g_strdown (entry->type);
+	entry->type = g_ascii_strdown($2, -1);
 
 	yyclearin;
 	YYACCEPT;
@@ -348,8 +342,9 @@ value:	  L_NAME '=' content
     BibtexField * field;
     BibtexFieldType type = BIBTEX_OTHER;
 
-    g_strdown ($1);
-    field = g_hash_table_lookup (entry->table, $1);
+    gchar* tmp = g_ascii_strdown ($1, -1);
+    field = g_hash_table_lookup (entry->table, tmp);
+    g_free(tmp);
 
     /* Get a new instance of a field name */
     if (field) {
@@ -469,7 +464,7 @@ simple_content:   L_DIGIT
     $$ = bibtex_struct_new (BIBTEX_STRUCT_REF);
     $$->value.ref = g_strdup ($1);
 
-    /* g_strdown ($$->value.ref); */
+    /* g_ascii_strdown ($$->value.ref, -1); */
 }
 /* -------------------------------------------------- */
 	       | content_brace
