@@ -35,7 +35,7 @@ void bibtex_message_handler (const gchar *log_domain G_GNUC_UNUSED,
 			     const gchar *message,
 			     gpointer user_data G_GNUC_UNUSED)
 {
-    gchar * name = g_get_prgname ();
+    const gchar * name = g_get_prgname ();
 
     if (name) {
 	fprintf (stderr, "%s: ", name);

@@ -45,6 +45,8 @@ NAME     [^ \\\t{}\"@,=%#\n\r~]+
 BODY 	 [^{}\\\" \n\t\r~]+
 
 %option noyywrap
+%option nounput
+%option noinput
 %x comment entry
 
 %%
