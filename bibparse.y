@@ -342,20 +342,13 @@ value:	  L_NAME '=' content
     BibtexField * field;
     BibtexFieldType type = BIBTEX_OTHER;
 
-    gchar* tmp = g_ascii_strdown ($1, -1);
-    field = g_hash_table_lookup (entry->table, tmp);
-    g_free(tmp);
+    name = g_ascii_strdown ($1, -1);
+    field = g_hash_table_lookup (entry->table, name);
 
     /* Get a new instance of a field name */
     if (field) {
 	g_string_sprintf (tmp_string, "field `%s' is already defined", $1); 
 	bibtex_parser_warning (tmp_string->str);
-
-	bibtex_field_destroy (field, TRUE);
-	name = $1;
-    }
-    else {
-	name = g_strdup ($1);
     }
 
     /* Search its type */
@@ -382,7 +375,7 @@ value:	  L_NAME '=' content
     field = bibtex_struct_as_field (bibtex_struct_flatten ($3),
 				    type);
 
-    g_hash_table_insert (entry->table, name, field);
+    g_hash_table_replace(entry->table, name, field);
 }
 /* -------------------------------------------------- */
 	| content
