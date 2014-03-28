@@ -3,6 +3,8 @@
 Version 1.2.7 (2014-03-25)
 
   * various fixes and cleanup of the code
+    (replace deprecated glib functions, fix gcc warnings,
+    fix refcounting errors, etc.)
 
 Version 1.2.6 (2014-01-22)
 
